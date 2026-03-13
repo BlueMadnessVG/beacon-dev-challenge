@@ -12,6 +12,63 @@ Build a health product catalog using **Next.js 15**, **TypeScript**, **MongoDB**
 - [pnpm](https://pnpm.io/) v9+
 - [MongoDB](https://www.mongodb.com/) running locally (or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster)
 
+### Local MongoDB Setup (Atlas CLI)
+
+The easiest way to run MongoDB locally is with the [Atlas CLI](https://www.mongodb.com/docs/atlas/cli/current/atlas-cli-deploy-local/).
+
+1. **Install the Atlas CLI**
+
+   ```bash
+   # macOS (Homebrew)
+   brew install mongodb-atlas-cli
+
+   # Windows (Winget)
+   winget install -e --id MongoDB.AtlasCLI
+   ```
+
+   For other platforms see the [installation docs](https://www.mongodb.com/docs/atlas/cli/current/install-atlas-cli/).
+
+2. **Start a local Atlas deployment**
+
+   ```bash
+   atlas deployments setup beacon-local --type local --port 27017 --bindIpAll --force
+   ```
+
+   This pulls the required Docker images and starts a local MongoDB instance on port `27017`. Docker Desktop (or Podman) must be running.
+
+3. **Verify it's running**
+
+   ```bash
+   atlas deployments list
+   ```
+
+   You should see `beacon-local` with status **IDLE**.
+
+4. **Get the connection string**
+
+   ```bash
+   atlas deployments connect beacon-local --connectWith connectionString
+   ```
+
+   The default connection string for a local deployment is:
+
+   ```
+   mongodb://localhost:27017/?directConnection=true
+   ```
+
+5. **Manage the deployment**
+
+   ```bash
+   # Pause
+   atlas deployments pause beacon-local
+
+   # Resume
+   atlas deployments start beacon-local
+
+   # Delete when you no longer need it
+   atlas deployments delete beacon-local
+   ```
+
 ### Setup
 
 ```bash
@@ -24,7 +81,8 @@ pnpm install
 
 # 3. Create your environment file
 cp .env.example .env
-# Edit .env and set your MONGODB_URI
+# If you used the Atlas CLI local deployment above, the default URI already works:
+#   MONGODB_URI=mongodb://localhost:27017/beacon-dev-challenge
 
 # 4. Seed the database with sample products
 pnpm seed
@@ -90,21 +148,27 @@ The seed script creates products with this shape — your Mongoose model should 
 }
 ```
 
-### Base Requirements (must complete)
+### Core Requirements (must complete)
 
-| # | Requirement                                                                                                                             | Skills Tested                               |
-|---|-----------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
-| 1 | **Product Mongoose model** (`src/models/product.ts`) with TypeScript interface                                                          | Mongoose, TypeScript                        |
-| 2 | **Product listing page** (`/products`) — Server Component that fetches all products from MongoDB and displays them in a responsive grid | Next.js SSR, Server Components, TailwindCSS |
-| 3 | **Product detail page** (`/products/[slug]`) with `generateMetadata` for SEO                                                            | Dynamic routes, metadata API                |
-| 4 | **Search functionality** — filter products by name (client-side or server-side)                                                         | React state or URL search params            |
-| 5 | **Category filter** — filter by product category                                                                                        | UI/UX, filtering logic                      |
-| 6 | **Add product form** — create new products via Server Action or API Route with validation                                               | Forms, validation, Server Actions           |
-| 7 | **Responsive layout** — works on mobile, tablet, desktop                                                                                | TailwindCSS responsive design               |
-| 8 | **TypeScript throughout** — no `any` types, proper interfaces                                                                           | TypeScript discipline                       |
-| 9 | **Clean code structure** — logical file organization, meaningful names                                                                  | Code quality                                |
+| # | Requirement                                                                                                                                                        | Skills Tested                               |
+|---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
+| 1 | **Product Mongoose model** (`src/models/product.ts`) with TypeScript interface                                                                                     | Mongoose, TypeScript                        |
+| 2 | **Product listing page** (`/products`) — Server Component that fetches all products from MongoDB and displays them in a responsive grid (mobile, tablet, desktop) | Next.js SSR, Server Components, TailwindCSS |
+| 3 | **Product detail page** (`/products/[slug]`) with `generateMetadata` for SEO, responsive layout                                                                    | Dynamic routes, metadata API                |
+| 4 | **Search functionality** — filter products by name (client-side or server-side)                                                                                    | React state or URL search params            |
+| 5 | **Category filter** — filter by product category                                                                                                                   | UI/UX, filtering logic                      |
 
-### Bonus Challenges (optional, for mid-level signal)
+### Additional Requirements (complete if time allows)
+
+| # | Requirement                                                                                       | Skills Tested                     |
+|---|---------------------------------------------------------------------------------------------------|-----------------------------------|
+| 6 | **Add product form** — create new products via Server Action or API Route with validation         | Forms, validation, Server Actions |
+| 7 | **TypeScript throughout** — no `any` types, proper interfaces                                     | TypeScript discipline             |
+| 8 | **Clean code structure** — logical file organization, meaningful names                            | Code quality                      |
+
+### Bonus Challenges (stretch goals)
+
+Completing any bonus items within the time constraint is a strong positive signal. These are stretch goals — do not sacrifice core requirement quality to attempt them.
 
 | #  | Bonus                                                             | Skills Tested                |
 |----|-------------------------------------------------------------------|------------------------------|
@@ -143,18 +207,50 @@ The seed script creates products with this shape — your Mongoose model should 
     - Any bonus challenges you completed
     - What you would improve with more time
 
-**Time expectation:** 3–4 hours. Focus on quality over quantity — a well-implemented subset is better than a rushed
-complete solution.
+**Time expectation:** 1 hour. Focus on quality over quantity — a well-implemented subset is better than a rushed
+complete solution. Partial completion is expected; we evaluate the quality of what you build, not the quantity.
+
+---
+
+## AI / LLM Disclosure
+
+We believe in assessing **your** skills, not an AI's. Here's our policy:
+
+### What's allowed
+
+- Using AI tools (ChatGPT, Copilot, Claude, etc.) for **learning concepts** or **looking up syntax**
+- Standard IDE autocomplete (IntelliSense, TabNine line completions, etc.)
+- Referencing documentation, Stack Overflow, or tutorials
+
+### What's not allowed
+
+- **Wholesale code generation** — prompting an AI to produce entire components, pages, or features that you paste in
+- **AI-driven architecture** — having an LLM design your file structure, data flow, or component hierarchy without you understanding *why*
+- Copy-pasting AI output without being able to explain every line
+
+### What we evaluate in the live session
+
+After reviewing your submission, we conduct a **live coding session** where you will be asked to:
+
+- **Explain** your architectural decisions and trade-offs
+- **Modify** existing features or add small changes live, without AI assistance
+- **Debug** an issue we introduce, walking us through your thought process
+
+Candidates who relied heavily on AI-generated code typically struggle in these sessions, regardless of how polished the submission appears.
+
+### Disclosure
+
+If you used AI tools during this challenge, **please note which tools you used** in your Pull Request description. Honesty is valued — we understand AI tools are part of modern development. However, undisclosed heavy AI usage that becomes apparent during the live session will negatively impact your evaluation.
 
 ---
 
 ## Tips
 
+- **Prioritize ruthlessly** — get the 5 core requirements working before attempting anything else
 - Start with the Mongoose model and the listing page — get data flowing first
 - Use Server Components by default; only add `"use client"` where you need interactivity
-- The seed data includes products with low stock (< 5) and prescription requirements — use these for interesting UI
-  details
-- Run `pnpm test` to verify Vitest works — the example test is in `src/__tests__/example.test.ts`
+- Don't over-style — functional and clean beats pixel-perfect when time is tight
+- Commit early and often — small, iterative commits show your process
 - Check the four categories in the seed data for the category filter values
 
 Good luck!
